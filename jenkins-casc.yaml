@@ -1,0 +1,74 @@
+
+jenkins:
+  systemMessage: "Jenkins skonfigurowany za pomocą JCasC"
+  numExecutors: 2
+  mode: NORMAL
+
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "BUILD_TIMEOUT_MINUTES"
+            value: "30"
+
+tool:
+  maven:
+    installations:
+      - name: "Maven-3"
+        home: "/opt/maven"
+
+  nodejs:
+    installations:
+      - name: "NodeJS-22"
+        home: "/opt/nodejs"
+
+  dockerTool:
+    installations:
+      - name: "Docker"
+        home: "/usr"
+
+jobs:
+  - script: >
+      pipelineJob('example-pipeline') {
+        description('Przykladowe zadanie Pipeline')
+
+        definition {
+          cps {
+            script('''
+              pipeline {
+                agent any
+
+                options {
+                  timeout(time: 30, unit: 'MINUTES')
+                }
+
+                stages {
+                  stage('Checkout') {
+                    steps {
+                      echo 'Pobieranie kodu'
+                    }
+                  }
+
+                  stage('Build') {
+                    steps {
+                      echo 'Budowanie aplikacji'
+                    }
+                  }
+
+                  stage('Test') {
+                    steps {
+                      echo 'Uruchamianie testow'
+                    }
+                  }
+
+                  stage('Deploy') {
+                    steps {
+                      echo 'Wdrazanie aplikacji'
+                    }
+                  }
+                }
+              }
+            '''.stripIndent())
+            sandbox()
+          }
+        }
+      }
